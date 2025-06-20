@@ -1,0 +1,40 @@
+##
+# Default server configuration
+#
+server {
+    listen 80 default_server;
+    listen [::]:80 default_server;
+
+    # Укажите свой домен
+    server_name 50asugubkin;
+
+    # Обслуживание статики из папки build React
+    location / {
+        root /path/to/your/react/build;  # Укажите путь к папке build вашего React-приложения
+        try_files $uri /index.html;
+    }
+
+    # Прокси-запросы к Django API
+    location /api/ {
+        proxy_pass http://127.0.0.1:8000;  # Адрес вашего Django сервера (порт, на котором работает Django)
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    # Дополнительные настройки, например для логирования
+    access_log /var/log/nginx/access.log;
+    error_log /var/log/nginx/error.log;
+
+    # Дополнительные параметры безопасности, если нужно
+    # deny access to .htaccess files, if Apache's document root
+    location ~ /\.ht {
+        deny all;
+    }
+
+    # Добавьте эту строку, если хотите обслуживать другие статики
+    # location /static/ {
+    #    root /path/to/your/django/static/;
+    # }
+}

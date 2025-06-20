@@ -3,6 +3,7 @@ import django
 import logging
 import requests
 from io import BytesIO
+import asyncio
 from asgiref.sync import sync_to_async
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import ApplicationBuilder, CommandHandler, CallbackQueryHandler, ContextTypes
@@ -16,6 +17,9 @@ logging.basicConfig(level=logging.INFO)
 
 TOKEN = '7331193855:AAEt3ick0AKs5ou5u3Z9GySUPfLAtuWYvs4'
 ADMIN_CHAT_ID = 729995094
+
+if not asyncio.get_event_loop().is_running():
+    asyncio.set_event_loop(asyncio.new_event_loop())
 
 @sync_to_async
 def get_review_by_id(review_id):

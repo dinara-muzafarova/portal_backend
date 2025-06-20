@@ -2,10 +2,8 @@ from django.db import models
 from django.contrib.auth.models import User
 
 class History(models.Model):
-    name = models.CharField(max_length=255)
-    position = models.CharField(max_length=255)
-    photo = models.ImageField(upload_to='teachers/')
-    achievements = models.TextField()
+    photo = models.ImageField(upload_to='history/')
+    text = models.TextField()
 
 class StudentAchievement(models.Model):
     title = models.CharField(max_length=255)
@@ -42,7 +40,7 @@ class MediaContent(models.Model):
         return self.title or "Без названия"
 
     class Meta:
-        ordering = ['-uploaded_at']  # Сортировка по времени загрузки (по убыванию)
+        ordering = ['-uploaded_at']
 
 class PartnerCompany(models.Model):
     name = models.CharField(max_length=255)

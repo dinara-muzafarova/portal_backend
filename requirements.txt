@@ -1,0 +1,4 @@
+pip install -r requirements.txtDjango>=4.2,<5.0
+djangorestframework
+gunicorn
+psycopg2-binary

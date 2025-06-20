@@ -25,8 +25,11 @@ SECRET_KEY = 'django-insecure-@dgel_%atb3n_5$fw#r632xe2=f9m(wtsuj*8!q8$isahs+2vm
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', '127.0.0.1',"83.166.245.244", '50asugubkin.ru', 'www.50asugubkin.ru']
 
+CORS_ALLOWED_ORIGINS = [
+"http://localhost:3000",
+]
 
 # Application definition
 
@@ -51,7 +54,7 @@ REST_FRAMEWORK = {
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-
+SECURE_SSL_REDIRECT = False
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
@@ -138,4 +141,4 @@ TEMPLATES[0]['DIRS'] = [os.path.join(BASE_DIR, 'frontend')]
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-CORS_ALLOW_ALL_ORIGINS = True
+#CORS_ALLOW_ALL_ORIGINS = True

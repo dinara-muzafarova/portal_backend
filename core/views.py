@@ -1,5 +1,6 @@
 from django.http import JsonResponse
 from django.shortcuts import render
+from rest_framework.authtoken.views import ObtainAuthToken
 import threading
 import asyncio
 from rest_framework.parsers import MultiPartParser, FormParser
@@ -11,7 +12,8 @@ from bot import send_new_review
 from .serializers import MediaContentSerializer
 from rest_framework import status
 from django.shortcuts import render
-
+from rest_framework.views import APIView
+from rest_framework.authtoken.models import Token
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from .models import History, StudentAchievement, AlumniReview, MediaContent, PartnerCompany
@@ -65,29 +67,49 @@ class PartnerCompanyViewSet(viewsets.ModelViewSet):
     queryset = PartnerCompany.objects.all()
     serializer_class = PartnerCompanySerializer
 
+class CustomAuthToken(APIView):
+    def post(self, request, *args, **kwargs):
+        email = request.data.get('email')
+        password = request.data.get('password')
+
+        if not email or not password:
+            return Response({'error': 'Пожалуйста, предоставьте email и пароль'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            return Response({'error': 'Пользователь не найден'}, status=status.HTTP_404_NOT_FOUND)
+
+        if not user.check_password(password):
+            return Response({'error': 'Неверный пароль'}, status=status.HTTP_400_BAD_REQUEST)
+
+        token, created = Token.objects.get_or_create(user=user)
+        return Response({'token': token.key}, status=status.HTTP_200_OK)
+
+
 @api_view(['POST'])
 def register_user(request):
-    print("Вызван register_user")
-    username = request.data.get('username')
+    email = request.data.get('email')
     password = request.data.get('password')
 
-    if not username or not password:
-        return Response({'error': 'Требуется имя пользователя и пароль'}, status=400)
+    if not email or not password:
+        return Response({'error': 'Требуется email и пароль'}, status=400)
 
-    if User.objects.filter(username=username).exists():
-        return Response({'error': 'Пользователь уже существует'}, status=400)
+    if User.objects.filter(email=email).exists():
+        return Response({'error': 'Пользователь с таким email уже существует'}, status=400)
 
-    User.objects.create_user(username=username, password=password)
+    user = User.objects.create_user(username=email, email=email, password=password)
     return Response({'message': 'Пользователь создан'}, status=201)
+
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def current_user_info(request):
     user = request.user
     return Response({
-        "username": user.username,
         "email": user.email,
     })
+
 
 @api_view(['POST'])
 def like_review(request, pk):
